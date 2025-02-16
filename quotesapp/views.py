@@ -33,26 +33,35 @@ def author(request):
 
 def quote(request):
     tags = Tag.objects.all()
-    author = Author.objects.all()
+    authors = Author.objects.all()
 
     if request.method == 'POST':
         form = QuoteForm(request.POST)
         if form.is_valid():
-            new_quote = form
+            new_quote = form.save(commit=False)
 
-            choice_tags = Tag.objects.filter(name__in=request.POST.getlist('tags'))
-            for tag in choice_tags.iterator():
-                new_quote.tags.add(tag)
+            author_name = request.POST.get('author')
+            try:
+                author = Author.objects.get(fullname=author_name)
+                new_quote.author = author
+            except Author.DoesNotExist:
+                return render(request, 'quotesapp/quote.html', {
+                    "tags": tags,
+                    "authors": authors,
+                    "form": form,
+                    "error": "Author does not exist"
+                })
 
-            choice_authors = author.filter(name__in=request.POST.getlist('author')).first()
-            new_quote.author=choice_authors.id
             new_quote.save()
 
-            return redirect(to='quotesapp:main')
-        else:
-            return render(request, 'quotesapp/quote.html', {"tags": tags, 'author': author, 'form': form})
+            choice_tags = Tag.objects.filter(name__in=request.POST.getlist('tags'))
+            new_quote.tags.set(choice_tags)
 
-    return render(request, 'quotesapp/quote.html', {"tags": tags, 'author': author, 'form': QuoteForm()})
+            return redirect('quotesapp:main')
+
+        return render(request, 'quotesapp/quote.html', {"tags": tags, "authors": authors, 'form': form})
+
+    return render(request, 'quotesapp/quote.html', {"tags": tags, "authors": authors, 'form': QuoteForm()})
 
 def detail(request, quote_id):
     quote = get_object_or_404(Quote, pk=quote_id)
