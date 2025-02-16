@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Organizer</title>
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"/>
+</head>
+<body>
+<main class="container">
+    <nav style="margin-bottom: 20px; border-bottom: 2px solid; padding-left: 30px">
+        <ul>
+            <li><a href="{% url 'quotesapp:quote' %}" role="button">Add Quote</a></li>
+            <li><a href="{% url 'quotesapp:author' %}" role="button">Add Author</a></li>
+            <li><a href="{% url 'quotesapp:tag' %}" role="button">Add Tag</a></li>
+        </ul>
+    </nav>
+
+    {% for quote in quotes %}
+    <ul>
+        <li>
+            <a href="{% url 'quotesapp:detail' quote.id %}" role="button" class="outline"> {{ quote.quote }} </a>
+        </li>
+    </ul>
+    {% endfor %}
+</main>
+</body>
+</html>
+
