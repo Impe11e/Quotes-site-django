@@ -76,6 +76,6 @@ def quote(request):
         "form": QuoteForm()
     })
 
-def detail(request, quote_id):
-    quote = get_object_or_404(Quote, pk=quote_id)
-    return render(request, 'quoteapp/detail.html', {"quote": quote})
+def author_detail(request, author_id):
+    quote = get_object_or_404(Quote, pk=author_id)
+    return render(request, 'quotesapp/author_detail.html', {"quote": quote})
