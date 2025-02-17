@@ -40,9 +40,9 @@ def quote(request):
         if form.is_valid():
             new_quote = form.save(commit=False)
 
-            author_name = request.POST.get('author')
+            author_id = request.POST.get('author')
             try:
-                author = Author.objects.get(fullname=author_name)
+                author = Author.objects.get(id=author_id)
                 new_quote.author = author
             except Author.DoesNotExist:
                 return render(request, 'quotesapp/quote.html', {
@@ -54,14 +54,27 @@ def quote(request):
 
             new_quote.save()
 
-            choice_tags = Tag.objects.filter(name__in=request.POST.getlist('tags'))
+            choice_tags = Tag.objects.filter(id__in=request.POST.getlist('tags'))
             new_quote.tags.set(choice_tags)
 
             return redirect('quotesapp:main')
 
-        return render(request, 'quotesapp/quote.html', {"tags": tags, "authors": authors, 'form': form})
+        else:
 
-    return render(request, 'quotesapp/quote.html', {"tags": tags, "authors": authors, 'form': QuoteForm()})
+            print("Form is not valid. Errors:", form.errors)
+
+            return render(request, 'quotesapp/quote.html', {
+                "tags": tags,
+                "authors": authors,
+                "form": form,
+                "error": "Form is not valid. Please correct the errors below."
+            })
+
+    return render(request, 'quotesapp/quote.html', {
+        "tags": tags,
+        "authors": authors,
+        "form": QuoteForm()
+    })
 
 def detail(request, quote_id):
     quote = get_object_or_404(Quote, pk=quote_id)
